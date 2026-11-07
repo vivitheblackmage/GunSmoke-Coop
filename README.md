@@ -5,7 +5,10 @@ A patch that turns Gun.Smoke for the NES into a game for one or two players at t
 **Download** from the [Releases](../../releases) page:
 
 - `GunSmoke-Coop-Patcher.exe`: the patcher with options and a preview. Windows 10/11 x64, a single file, no install.
-- `Gun.Smoke (USA) (Co-op).ips` and `Gun.Smoke (Europe) (Co-op).ips`: plain IPS patches with the default options (friendly fire off, player 2 in palette 2), for any IPS patcher on any system. The European patch also writes the PAL header. Apply each patch to an unmodified ROM with the SHA-256 listed below.
+- `Gun.Smoke (Co-op).ips`: a plain IPS patch with the default options (friendly fire off, player 2 in palette 2), for any IPS patcher on any system.
+  - The same patch fits both the USA and the European ROM: the patch writes only places where the two ROMs are the same.
+  - Apply it to an unmodified ROM with a 16-byte header and a SHA-256 listed below.
+  - The patch does not change the header. A European ROM keeps its own header, so if your emulator runs it at 60 Hz (the music too fast), set the region to PAL, or use the patcher, which writes a PAL header.
 
 **No game data is included.** The patcher and the patches only contain the patch's own code. Bring your own ROM: the patcher checks it and writes a patched copy where you choose.
 
