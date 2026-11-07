@@ -1,8 +1,14 @@
-*.exe
+# Game ROMs are never part of this repository: bring your own.
 *.nes
 *.fds
 *.unf
-*.ips
 *.mss
 *.bak
+# Release files (attached to a GitHub release, not committed)
+*.exe
+*.ips
 NEXT-STEPS.md
+# Build output
+build/
+out/
+.tmp/

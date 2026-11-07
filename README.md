@@ -2,9 +2,12 @@
 
 A patch that turns Gun.Smoke for the NES into a game for one or two players at the same time. The patched game runs on a real NES, in emulators and on the MiSTer.
 
-**Download:** `GunSmoke-Coop-Patcher.exe` from the [Releases](../../releases) page. Windows 10/11 x64, a single file, no install.
+**Download** from the [Releases](../../releases) page:
 
-**No game data is included.** The patcher only contains the patch's own code. Bring your own ROM: the patcher checks it and writes a patched copy where you choose.
+- `GunSmoke-Coop-Patcher.exe`: the patcher with options and a preview. Windows 10/11 x64, a single file, no install.
+- `Gun.Smoke (USA) (Co-op).ips` and `Gun.Smoke (Europe) (Co-op).ips`: plain IPS patches with the default options (friendly fire off, player 2 in palette 2), for any IPS patcher on any system. The European patch also writes the PAL header. Apply each patch to an unmodified ROM with the SHA-256 listed below.
+
+**No game data is included.** The patcher and the patches only contain the patch's own code. Bring your own ROM: the patcher checks it and writes a patched copy where you choose.
 
 ## Features
 
@@ -56,6 +59,64 @@ GunSmoke-Coop-Patcher --verify <rom> <patched rom>          compares the patcher
 GunSmoke-Coop-Patcher --states <Mesen.exe> <patched rom>    makes the Mesen states without the window
 GunSmoke-Coop-Patcher --preview <out.bmp> [rom]             saves a picture of the window
 ```
+
+## Building from source
+
+### The patcher (Windows, MSVC)
+
+Requires Visual Studio with C++ and CMake (tested with Visual Studio 2026). SDL 3 is downloaded and linked statically unless CMake finds an installed copy.
+
+```
+cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+```
+
+The result is a single file: `build/GunSmoke-Coop-Patcher.exe`.
+
+### The patch (Node.js 20 or later)
+
+The hack is 6502 assembly in `tools/gunsmoke-coop/coop.asm`, assembled by a small assembler in `tools/asm65816.mjs`. Put your ROMs in this folder (they are git-ignored) and run:
+
+```
+node tools/gunsmoke-coop/build.mjs
+```
+
+This regenerates `tools/gunsmoke-coop/patch_data.hpp`, the patcher's data. For each supported ROM present, it also writes into `out/`:
+
+- the patched ROM;
+- an IPS patch;
+- `coop.sym`, the labels.
+
+Then rebuild the patcher. Set `GS_FRIENDLY_FIRE=1` to build the ROMs and IPS patches with friendly fire on.
+
+### Tests
+
+```
+node tools/gunsmoke-coop/test.mjs ["<rom>"]
+```
+
+`test.mjs` runs the original and the patched ROM in a small NES CPU model (`tools/nes/`). It defaults to the USA ROM. It checks:
+
+- one player behaves like the original;
+- the attract mode is unchanged;
+- the title menu;
+- the horse, and taking a life from the partner;
+- full two-player games until game over.
+
+`tools/gunsmoke-coop/mesen-coop.lua` plays the same in Mesen 2's test runner.
+
+### Layout
+
+| Path | What |
+|---|---|
+| `tools/gunsmoke-coop/coop.asm` | the hack (6502) |
+| `tools/gunsmoke-coop/build.mjs` | builds the patch for every supported ROM and checks where it writes |
+| `tools/gunsmoke-coop/variants.mjs` | the supported ROMs |
+| `tools/gunsmoke-coop/patcher.cpp` | the patcher's window |
+| `tools/gunsmoke-coop/patch_data.hpp` | generated: the hack's bytes |
+| `tools/gunsmoke-coop/test.mjs`, `*.lua`, `make-states.mjs` | tests and Mesen scripts |
+| `games/gunsmoke/`, `src/compat/nes/` | a re-implementation of the game's engine, used only to draw the patcher's preview from your ROM |
+| `docs/HACK.md` | how the hack works |
 
 ## Known limits
 
